@@ -1,6 +1,6 @@
 {
   "name": "hazo_feedback",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "Drop-in contextual feedback widget for hazo apps",
   "main": "./dist/index.js",
@@ -50,8 +50,12 @@
     "@tiptap/extension-placeholder": "^3.20.5"
   },
   "peerDependenciesMeta": {
-    "hazo_notify": { "optional": false },
-    "hazo_logs": { "optional": true }
+    "hazo_notify": {
+      "optional": false
+    },
+    "hazo_logs": {
+      "optional": true
+    }
   },
   "dependencies": {
     "clsx": "^2.1.1",
