@@ -1,0 +1,40 @@
+{
+  "name": "hazo_feedback_test_app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3030",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "hazo_feedback": "^1.0.0",
+    "hazo_connect": "^2.4.0",
+    "hazo_auth": "^5.3.1",
+    "hazo_ui": "^2.9.0",
+    "hazo_notify": "^3.1.0",
+    "hazo_files": "^1.0.0",
+    "@tiptap/react": "^3.20.5",
+    "@tiptap/starter-kit": "^3.20.5",
+    "@tiptap/extension-image": "^3.20.5",
+    "@tiptap/extension-link": "^3.20.5",
+    "@tiptap/extension-placeholder": "^3.20.5",
+    "lucide-react": "^0.553.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "next": "^16.0.10",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0",
+    "tailwindcss": "^4.2.4",
+    "@tailwindcss/postcss": "^4.2.4",
+    "postcss": "^8.4.49",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^16.0.10"
+  }
+}

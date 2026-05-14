@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Test app
+test-app/.next/
+test-app/node_modules/
+test-app/.env.local
+test-app/*.db
+test-app/logs/
+test-app/test-uploads/
+test-app/next-env.d.ts
+
+# Logs
+/logs/
+*.log
+
+# Test coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

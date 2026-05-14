@@ -1,0 +1,12 @@
+Subject: We received your feedback ({{ref_id}})
+
+Hi {{name}},
+
+Thanks for sending feedback. We've logged it as reference {{ref_id}}.
+
+Subject: {{subject}}
+Category: {{category}}
+Submitted: {{submitted_at}}
+
+There's no action needed from you. If you want to follow up later,
+just quote the reference {{ref_id}}.

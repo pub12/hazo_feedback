@@ -1,0 +1,92 @@
+{
+  "name": "hazo_feedback",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Drop-in contextual feedback widget for hazo apps",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/index.client.d.ts",
+      "default": "./dist/index.client.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && cp -r src/email_templates dist/email_templates",
+    "dev:package": "tsc -p tsconfig.build.json --watch",
+    "dev": "npm run build && cd test-app && npm run dev",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.cjs",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.cjs --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "migrations",
+    "scripts",
+    "config",
+    "README.md",
+    "SETUP_CHECKLIST.md",
+    "CHANGE_LOG.md"
+  ],
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "next": "^14.0.0 || ^16.0.0",
+    "hazo_connect": "^2.4.0",
+    "hazo_auth": "^5.3.1",
+    "hazo_ui": "^2.9.0",
+    "hazo_files": "^1.0.0",
+    "hazo_notify": "^3.1.0",
+    "lucide-react": "^0.553.0",
+    "@tiptap/react": "^3.20.5",
+    "@tiptap/starter-kit": "^3.20.5",
+    "@tiptap/extension-image": "^3.20.5",
+    "@tiptap/extension-link": "^3.20.5",
+    "@tiptap/extension-placeholder": "^3.20.5"
+  },
+  "peerDependenciesMeta": {
+    "hazo_notify": { "optional": false },
+    "hazo_logs": { "optional": true }
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.5.0",
+    "isomorphic-dompurify": "^2.9.0",
+    "turndown": "^7.1.3",
+    "html2canvas": "^1.4.1",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "next": "^16.0.10",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0",
+    "tailwindcss": "^4.2.4",
+    "@tailwindcss/postcss": "^4.2.4",
+    "postcss": "^8.4.49",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^16.0.10",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "@types/jest": "^30.0.0",
+    "jest-environment-node": "^30.2.0",
+    "@types/turndown": "^5.0.5",
+    "hazo_auth": "^5.3.1",
+    "hazo_connect": "^2.4.0",
+    "hazo_ui": "^2.9.0",
+    "hazo_notify": "^3.1.0",
+    "@tiptap/react": "^3.20.5",
+    "@tiptap/starter-kit": "^3.20.5",
+    "@tiptap/extension-image": "^3.20.5",
+    "@tiptap/extension-link": "^3.20.5",
+    "@tiptap/extension-placeholder": "^3.20.5"
+  }
+}

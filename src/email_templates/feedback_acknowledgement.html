@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>We received your feedback ({{ref_id}})</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#1a1a2e;padding:28px 32px;">
+              <p style="margin:0;font-size:13px;color:#a0a0b0;letter-spacing:0.05em;text-transform:uppercase;">Feedback received</p>
+              <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:#ffffff;">We received your feedback ({{ref_id}})</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px;">
+              <p style="margin:0 0 20px;font-size:16px;color:#1a1a2e;">Hi {{name}},</p>
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#3a3a4e;">
+                Thanks for taking the time to send us feedback. We've logged it and our team will take a look.
+              </p>
+
+              <!-- Summary table -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f8fb;border-radius:6px;padding:4px 0;margin:0 0 24px;">
+                <tr>
+                  <td style="padding:10px 20px;border-bottom:1px solid #ebebf0;">
+                    <span style="font-size:12px;color:#7070a0;text-transform:uppercase;letter-spacing:0.04em;">Reference</span><br />
+                    <span style="font-size:15px;font-weight:600;color:#1a1a2e;font-family:monospace;">{{ref_id}}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 20px;border-bottom:1px solid #ebebf0;">
+                    <span style="font-size:12px;color:#7070a0;text-transform:uppercase;letter-spacing:0.04em;">Subject</span><br />
+                    <span style="font-size:15px;color:#1a1a2e;">{{subject}}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 20px;border-bottom:1px solid #ebebf0;">
+                    <span style="font-size:12px;color:#7070a0;text-transform:uppercase;letter-spacing:0.04em;">Category</span><br />
+                    <span style="font-size:15px;color:#1a1a2e;">{{category}}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 20px;">
+                    <span style="font-size:12px;color:#7070a0;text-transform:uppercase;letter-spacing:0.04em;">Submitted</span><br />
+                    <span style="font-size:15px;color:#1a1a2e;">{{submitted_at}}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#3a3a4e;">
+                No action is needed from you. If you want to follow up later, just quote the reference
+                <strong style="color:#1a1a2e;font-family:monospace;">{{ref_id}}</strong> in any communication with us.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f8f8fb;padding:20px 32px;border-top:1px solid #ebebf0;">
+              <p style="margin:0;font-size:12px;color:#9090b0;line-height:1.5;">
+                This is an automated confirmation. Please do not reply to this email.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

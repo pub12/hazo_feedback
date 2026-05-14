@@ -1,0 +1,40 @@
+[app]
+app_id = kinstripe
+; Optional: expose via NEXT_PUBLIC_APP_VERSION env var
+; app_version = ${NEXT_PUBLIC_APP_VERSION}
+
+[admin]
+; Permission string used to gate admin routes.
+; Must match what you provisioned via scripts/provision_feedback_admin.sql.
+admin_scope = hazo_feedback:kinstripe:admin
+
+[rate_limit]
+; Maximum submissions per anonymous session per window
+per_anon_count = 10
+per_anon_window_ms = 60000
+; Maximum submissions per authenticated user per window
+per_user_count = 50
+per_user_window_ms = 3600000
+; Maximum submissions per IP per window
+per_ip_count = 100
+per_ip_window_ms = 60000
+
+[attachments]
+; Maximum attachments per submission. Default: 5.
+max_count = 5
+; Per-file size limit in bytes. Default: 10 MB.
+max_bytes_per_file = 10485760
+; Total per-submission size limit in bytes. Default: 25 MB.
+; NOTE: if deploying on Vercel, the catch-all route MUST declare
+; `export const runtime = 'nodejs'` — see SETUP_CHECKLIST.md.
+; Vercel edge runtime has a 4.5 MB body limit; Node runtime removes this limit.
+total_max_bytes = 26214400
+
+[notify]
+; Set to false to skip acknowledgement emails even if hazo_notify is configured.
+acknowledge_email_enabled = true
+; From address for acknowledgement emails
+acknowledge_email_from = feedback@kinstripe.app
+acknowledge_email_from_name = Kinstripe
+; Subject uses Handlebars syntax. Available variable: {{ref_id}}
+acknowledge_email_subject = We received your feedback ({{ref_id}})
