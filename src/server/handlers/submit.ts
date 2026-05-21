@@ -390,8 +390,6 @@ export async function handle_submit(
       config.notifyConfig.acknowledgeEmailFrom &&
       user_email_snapshot
     ) {
-      const notify_connect = await notifyOptions.getHazoConnect();
-
       send_acknowledgement({
         to: user_email_snapshot,
         from: notifyOptions.from,
@@ -401,7 +399,9 @@ export async function handle_submit(
         subject: config.notifyConfig.acknowledgeEmailSubject,
         category: category_raw,
         submittedAt: new Date(),
-        hazo_connect: notify_connect,
+        recipientUserId: user_id ?? "",
+        scopeId: "",
+        deepLink: `/feedback/thread/${ref_id}`,
       }).catch((err: unknown) => {
         logger?.warn('handle_submit: acknowledgement email failed', { error: String(err) });
       });

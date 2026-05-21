@@ -1,6 +1,6 @@
 import "server-only";
 
-import { send_template_email } from "hazo_notify/template_manager";
+import { dispatch } from "hazo_notify/dispatcher";
 
 export interface AckEmailOptions {
   to: string;
@@ -11,33 +11,43 @@ export interface AckEmailOptions {
   subject: string;
   category: string;
   submittedAt: Date;
-  hazo_connect: unknown;
+  recipientUserId: string;
+  scopeId?: string;
+  deepLink: string;
 }
 
 export async function send_acknowledgement(opts: AckEmailOptions): Promise<void> {
-  const result = await send_template_email(
-    {
-      template_name: "feedback_acknowledgement",
-      to: opts.to,
-      from: opts.from,
-      from_name: opts.fromName,
-      scope_id: null,
-      variables: {
-        ref_id: opts.refId,
-        name: opts.name,
-        subject: opts.subject,
-        category: opts.category,
-        submitted_at: opts.submittedAt.toISOString(),
+  try {
+    await dispatch({
+      event_type: "hazo_feedback.acknowledgement",
+      subject_id: opts.refId,
+      scope_id: opts.scopeId ?? "",
+      recipient_user_ids: [opts.recipientUserId],
+      in_app_text: `Thanks for your feedback (${opts.refId})`,
+      deep_link: opts.deepLink,
+      surfaces: { in_app: true, banner: false },
+      channels: { email: true },
+      channel_payloads: {
+        email: {
+          template_name: "feedback_acknowledgement",
+          to: opts.to,
+          from: opts.from,
+          from_name: opts.fromName,
+          variables: {
+            ref_id: opts.refId,
+            name: opts.name,
+            subject: opts.subject,
+            category: opts.category,
+            submitted_at: opts.submittedAt.toISOString(),
+          },
+        },
       },
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    opts.hazo_connect as any,
-  );
-
-  if (!result.success) {
+      batch_window_ms: 0,
+    });
+  } catch (err) {
     console.warn(
-      "[hazo_feedback] send_acknowledgement: failed to send acknowledgement email",
-      { to: opts.to, ref_id: opts.refId, error: result.error, message: result.message },
+      "[hazo_feedback] send_acknowledgement: dispatch failed",
+      { to: opts.to, ref_id: opts.refId, error: String(err) },
     );
   }
 }
