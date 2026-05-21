@@ -4,6 +4,18 @@ All notable changes to `hazo_feedback` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-05-21
+
+### Added
+- **`ReplyComposer` component** — exported from `hazo_feedback/client`. Wraps `FeedbackBodyEditor` (Tiptap) + `AttachmentTray` into a self-resetting send form. Admin ConversationTab and user-facing `FeedbackThread` now share this composer, giving replies the same rich-text + screenshot-paste + file-upload experience as the main submission widget.
+- **Thread attachment endpoint** — new `GET /thread/:refId/attachment/:attachmentId` route; accessible to both the submitter and admins. Verifies the attachment belongs to an event on the requested submission before serving the file. Inline images in `FeedbackThread` are now rewritten to this endpoint instead of the admin-only endpoint.
+
+### Fixed
+- **Admin attachment 403 on reply images** — `GET /admin/attachment/:id` now resolves the owning submission via `event_id` when `submission_id` is `null` (event-anchored reply attachments always have a null `submission_id`).
+- **Category tab buttons trigger form submit** — added `type="button"` to all category tab buttons in the feedback widget to prevent inadvertent form submission.
+
+---
+
 ## [2.1.0] - 2026-05-21
 
 ### Added

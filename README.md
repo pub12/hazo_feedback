@@ -40,7 +40,7 @@ Ensure your app has these installed (hazo_feedback declares them as peers):
 | `hazo_auth` | `^5.3.1` | User auth, `ensure_anon_id`, `get_client_ip` |
 | `hazo_ui` | `^2.9.0` | Dialog, Drawer, Form, Button primitives |
 | `hazo_files` | `^1.0.0` | File upload, storage, retrieval |
-| `hazo_notify` | `^3.1.0` | Acknowledgement email templates (required, not optional) |
+| `hazo_notify` | `^5.0.0` | Acknowledgement + reply email templates (required, not optional) |
 | `lucide-react` | `^0.553.0` | Icons |
 | `@tiptap/react` | `^3.20.5` | Rich text editor |
 | `@tiptap/starter-kit` | `^3.20.5` | Tiptap extensions (bold, italic, lists, etc.) |
@@ -325,6 +325,28 @@ console.log(FEEDBACK_STRINGS['button.open_feedback']); // "Send feedback"
 ## Reply threads
 
 After a feedback submission, the admin can reply via the Conversation tab in the admin dashboard. The submitter is notified via hazo_notify's in-app inbox (always) and email (configurable). The submitter can reply back from the standalone thread page: `<FeedbackThread refId="…" apiBase="/api/feedback" />`.
+
+Both the admin ConversationTab and `FeedbackThread` use the shared `ReplyComposer` component — the same Tiptap rich-text editor with inline image paste and file attachments available in the main submission widget.
+
+**Using `ReplyComposer` standalone:**
+
+```typescript
+import { ReplyComposer } from 'hazo_feedback/client';
+
+<ReplyComposer
+  onSend={async (bodyHtml, inlineBlobs, attachments) => {
+    // post reply to your endpoint; throw on error to keep the form open
+    await sendReply({ bodyHtml, inlineBlobs, attachments });
+  }}
+  placeholder="Write a reply…"
+  sendLabel="Send reply"
+  translate={t}
+/>
+```
+
+The component resets automatically when `onSend` resolves. Throw from `onSend` to display an inline error and keep the form state intact.
+
+Inline images in reply bubbles are served via the thread attachment endpoint (`GET /thread/:refId/attachment/:attachmentId`), which is accessible to both the submitter and admins — no separate auth token required beyond being logged in as the submitter.
 
 Constraints:
 - Authed users only (anon submitters don't get reply threads in v2.1).
