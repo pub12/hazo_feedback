@@ -12,11 +12,18 @@ interface EventRow extends Record<string, unknown> {
   from_value: string | null;
   to_value: string | null;
   comment: string | null;
+  body_html: string | null;
+  body_text: string | null;
   created_at: string;
 }
 
 function row_to_event(row: EventRow): FeedbackEvent {
-  return { ...row, event_type: row.event_type as FeedbackEventType };
+  return {
+    ...row,
+    event_type: row.event_type as FeedbackEventType,
+    body_html: row.body_html,
+    body_text: row.body_text,
+  };
 }
 
 export function create_event_service(adapter: unknown) {
@@ -33,10 +40,34 @@ export function create_event_service(adapter: unknown) {
     return rows.map(row_to_event);
   }
 
-  async function log_event(data: Omit<EventRow, 'created_at'>): Promise<FeedbackEvent> {
-    const rows = await svc.insert({ ...data, created_at: new Date().toISOString() });
+  async function list_replies_for_submission(submissionId: string): Promise<FeedbackEvent[]> {
+    const rows = await svc.list((qb) => {
+      qb.where('submission_id', 'eq', submissionId);
+      qb.whereIn('event_type', ['admin_reply', 'user_reply']);
+      qb.order('created_at', 'asc');
+      return qb;
+    });
+    return rows.map(row_to_event);
+  }
+
+  async function count_admin_replies(submissionId: string): Promise<number> {
+    const rows = await svc.list((qb) => {
+      qb.where('submission_id', 'eq', submissionId);
+      qb.order('created_at', 'asc');
+      return qb;
+    });
+    return rows.filter((r) => r.event_type === 'admin_reply').length;
+  }
+
+  async function log_event(data: Omit<EventRow, 'created_at'> & { body_html?: string | null; body_text?: string | null }): Promise<FeedbackEvent> {
+    const rows = await svc.insert({
+      ...data,
+      body_html: data.body_html || null,
+      body_text: data.body_text || null,
+      created_at: new Date().toISOString(),
+    });
     return row_to_event(rows[0]);
   }
 
-  return { list_for_submission, log_event, raw: svc };
+  return { list_for_submission, list_replies_for_submission, count_admin_replies, log_event, raw: svc };
 }
