@@ -36,7 +36,7 @@ export async function handle_admin_update(
       return NextResponse.json({ error: 'Missing submission id' }, { status: 400 });
     }
 
-    let body: { status?: unknown; priority?: unknown; marked_spam?: unknown };
+    let body: { status?: unknown; priority?: unknown; marked_spam?: unknown; is_public?: unknown };
     try {
       body = await request.json();
     } catch {
@@ -88,6 +88,20 @@ export async function handle_admin_update(
     }
     if (body.marked_spam !== undefined) {
       patch.marked_spam = Boolean(body.marked_spam);
+    }
+    if (typeof body.is_public === 'boolean') {
+      if (existing.category !== 'feature' && body.is_public) {
+        return NextResponse.json(
+          { error: 'Only feature requests can be made public' },
+          { status: 422 },
+        );
+      }
+      if (existing.marked_spam && body.is_public) {
+        return NextResponse.json({ error: 'Forbidden (spam)' }, { status: 403 });
+      }
+      if (Boolean(existing.is_public) !== body.is_public) {
+        patch.is_public = body.is_public ? 1 : 0;
+      }
     }
 
     // Handle resolved_at transitions
@@ -142,6 +156,20 @@ export async function handle_admin_update(
           event_type: 'status_changed',
           from_value: `spam:${existing.marked_spam}`,
           to_value: `spam:${Boolean(patch.marked_spam)}`,
+          comment: null,
+        })
+      );
+    }
+
+    if (patch.is_public !== undefined && Boolean(patch.is_public) !== Boolean(existing.is_public)) {
+      event_promises.push(
+        event_service.log_event({
+          id: crypto.randomUUID(),
+          submission_id: id,
+          actor_id,
+          event_type: 'visibility_changed',
+          from_value: existing.is_public ? 'public' : 'private',
+          to_value:   patch.is_public ? 'public' : 'private',
           comment: null,
         })
       );
