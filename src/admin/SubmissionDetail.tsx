@@ -14,6 +14,7 @@ import { OverviewTab } from './tabs/OverviewTab.js';
 import { ContextTab } from './tabs/ContextTab.js';
 import { AttachmentsTab } from './tabs/AttachmentsTab.js';
 import { ActivityTab } from './tabs/ActivityTab.js';
+import { ConversationTab } from './tabs/ConversationTab.js';
 import { PromptAccordion } from './PromptAccordion.js';
 
 const cn = (...inputs: Parameters<typeof clsx>) => twMerge(clsx(...inputs));
@@ -38,10 +39,11 @@ interface SubmissionDetailProps {
   onUpdate?: () => void;
 }
 
-type TabKey = 'overview' | 'context' | 'attachments' | 'activity';
+type TabKey = 'overview' | 'conversation' | 'activity' | 'context' | 'attachments';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
+  { key: 'conversation', label: 'Conversation' },
   { key: 'context', label: 'Context' },
   { key: 'attachments', label: 'Attachments' },
   { key: 'activity', label: 'Activity' },
@@ -324,6 +326,14 @@ export function SubmissionDetail({
       <div className="flex-1 overflow-y-auto min-h-0" role="tabpanel">
         {activeTab === 'overview' && (
           <OverviewTab submission={submission} apiBase={apiBase} />
+        )}
+        {activeTab === 'conversation' && (
+          <ConversationTab
+            submissionId={submissionId}
+            events={events}
+            apiBase={apiBase}
+            onPosted={refresh}
+          />
         )}
         {activeTab === 'context' && (
           <ContextTab submission={submission} />
