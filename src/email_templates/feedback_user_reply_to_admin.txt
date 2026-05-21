@@ -1,0 +1,5 @@
+{{replier_name}} replied on feedback {{ref_id}} — {{subject}} ({{category}}):
+
+{{reply_body_preview}}
+
+Open in admin: {{thread_url}}

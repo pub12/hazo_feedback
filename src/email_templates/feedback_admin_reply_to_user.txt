@@ -1,0 +1,9 @@
+Hi {{name}},
+
+You have a new reply on your feedback ({{ref_id}} — {{subject}}):
+
+{{reply_body_preview}}
+
+View the full conversation: {{thread_url}}
+
+— {{replier_name}}
