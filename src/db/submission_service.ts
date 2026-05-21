@@ -25,6 +25,7 @@ export interface SubmissionRow extends Record<string, unknown> {
   status: string;
   priority: string | null;
   marked_spam: boolean | number;
+  is_public: boolean | number;
   url: string;
   route: string | null;
   viewport_w: number | null;
@@ -50,6 +51,7 @@ function row_to_submission(row: SubmissionRow): FeedbackSubmission {
     priority: row.priority as FeedbackPriority | null,
     reproducibility: row.reproducibility as 'always' | 'sometimes' | 'once' | null,
     marked_spam: Boolean(row.marked_spam),
+    is_public: Boolean(row.is_public),
     consumer_context_redacted: row.consumer_context_redacted
       ? JSON.parse(row.consumer_context_redacted)
       : null,
@@ -74,6 +76,7 @@ export interface ListSubmissionsOptions {
   category?: FeedbackCategory;
   source?: string;
   markedSpam?: boolean;
+  isPublic?: boolean;
   search?: string;
   limit?: number;
   offset?: number;
@@ -91,6 +94,7 @@ export function create_submission_service(adapter: unknown) {
       if (opts.category) qb.where('category', 'eq', opts.category);
       if (opts.source) qb.where('source', 'eq', opts.source);
       if (opts.markedSpam !== undefined) qb.where('marked_spam', 'eq', opts.markedSpam ? 1 : 0);
+      if (opts.isPublic !== undefined) qb.where('is_public', 'eq', opts.isPublic ? 1 : 0);
       if (opts.search) {
         qb.where('ref_id', 'ilike', `%${opts.search}%`);
       }
@@ -122,12 +126,21 @@ export function create_submission_service(adapter: unknown) {
     return row_to_submission(rows[0]);
   }
 
+  async function set_visibility(id: string, isPublic: boolean): Promise<FeedbackSubmission> {
+    const rows = await svc.updateById(id, {
+      is_public: isPublic ? 1 : 0,
+      updated_at: new Date().toISOString(),
+    });
+    return row_to_submission(rows[0]);
+  }
+
   return {
     list_submissions,
     get_submission,
     get_submission_by_ref,
     insert_submission,
     update_submission,
+    set_visibility,
     raw: svc,
   };
 }
