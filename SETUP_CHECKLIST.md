@@ -2,6 +2,58 @@
 
 Step-by-step guide to integrate hazo_feedback into your Next.js app.
 
+## Upgrading from v2.0.x to v2.1.0
+
+### 1. Bump the peer dep
+
+Update your app's `hazo_notify` dep to `^5.0.0`. v5 introduces breaking changes (top-level `send_email` / `send_template_email` removed in favor of `dispatch()`). Confirm a hazo_notify v5 worker is running in your consumer environment (e.g., a `hazo_jobs` handler calling `flushChannelOnce('email', ...)`) — required for ack and reply emails to actually deliver.
+
+### 2. Run the schema migration
+
+Apply `migrations/002_voting_and_replies.sql`:
+- Postgres: `psql -d <db> -f node_modules/hazo_feedback/migrations/002_voting_and_replies.sql`
+- SQLite: extract the SQLite block (commented in the file) and run with `sqlite3 <db>`.
+
+### 3. Re-sync system templates
+
+If your app calls `sync_system_templates(hazo_feedback_template_manifest, options)` (per v2.0.0 step 8), no code change is required — the manifest now exports three entries. Re-run the call (typically on next boot) so the two new templates land in `hazo_notify_templates`.
+
+### 4. Update `createFeedbackServer` options
+
+```ts
+createFeedbackServer({
+  // existing options unchanged…
+  threadUrlBuilder: (refId) => `${process.env.NEXT_PUBLIC_BASE_URL}/feedback/thread/${refId}`,
+  listAdminsForBroadcast: async () => {
+    // Return the user_ids of users holding the adminScope permission.
+    return [/* fetch from your auth system */];
+  },
+});
+```
+
+### 5. Mount new client routes
+
+- `app/feedback/thread/[refId]/page.tsx`:
+  ```tsx
+  'use client';
+  import { FeedbackThread } from 'hazo_feedback/client';
+
+  export default function ThreadPage({ params }: { params: { refId: string } }) {
+    return <FeedbackThread refId={params.refId} apiBase="/api/feedback" />;
+  }
+  ```
+
+- (Optional) Mount `<PublicFeatureBoard />` on your roadmap route, e.g. `app/roadmap/page.tsx`.
+
+### 6. Optional: tune reply email flags
+
+In `config/hazo_feedback_config.ini`, add to `[notify]`:
+```ini
+reply_email_to_user_enabled = true
+reply_email_to_admin_enabled = true
+```
+Set either to `false` to suppress that direction.
+
 ## Prerequisites
 
 - Node.js 18+ with npm
