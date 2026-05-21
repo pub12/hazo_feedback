@@ -12,6 +12,9 @@ import { handle_user_reply } from './handlers/user_reply.js';
 import { handle_thread } from './handlers/thread.js';
 import { handle_admin_export_prompt } from './handlers/admin_export_prompt.js';
 import { handle_admin_attachment } from './handlers/admin_attachment.js';
+import { handle_vote } from './handlers/vote.js';
+import { handle_public_board } from './handlers/public_board.js';
+import { handle_admin_voters } from './handlers/admin_voters.js';
 import { extract_feedback_path, match_route } from './router.js';
 
 // ─── Shared options builder ───────────────────────────────────────────────────
@@ -116,6 +119,16 @@ export function createFeedbackServer(options: FeedbackServerOptions): FeedbackSe
         return wrap_submit(resolved)(request, params);
       }
 
+      // ── POST /vote/:submissionId ──────────────────────────────────────────────
+      const vote_params = match_route(segments, ['vote', ':submissionId']);
+      if (vote_params !== null) {
+        return handle_vote(request, vote_params, {
+          getHazoConnect: resolved.getHazoConnect,
+          appId:          resolved.appId,
+          logger:         resolved.logger,
+        });
+      }
+
       // ── POST /admin/:id/comment ───────────────────────────────────────────
       const comment_params = match_route(segments, ['admin', ':id', 'comment']);
       if (comment_params !== null) {
@@ -165,6 +178,16 @@ export function createFeedbackServer(options: FeedbackServerOptions): FeedbackSe
         });
       }
 
+      // GET /public-board
+      const board_params = match_route(segments, ['public-board']);
+      if (board_params !== null) {
+        return handle_public_board(request, board_params, {
+          getHazoConnect: resolved.getHazoConnect,
+          appId:          resolved.appId,
+          logger:         resolved.logger,
+        });
+      }
+
       // GET /admin/attachment/:attachmentId — must be checked before GET /admin/:id
       const attachment_params = match_route(segments, ['admin', 'attachment', ':attachmentId']);
       if (attachment_params !== null) {
@@ -181,6 +204,16 @@ export function createFeedbackServer(options: FeedbackServerOptions): FeedbackSe
       const export_params = match_route(segments, ['admin', ':id', 'export-prompt']);
       if (export_params !== null) {
         return handle_admin_export_prompt(request, export_params, make_admin_file_opts(resolved));
+      }
+
+      // GET /admin/:id/voters — must be checked before GET /admin/:id
+      const voters_params = match_route(segments, ['admin', ':id', 'voters']);
+      if (voters_params !== null) {
+        return handle_admin_voters(request, voters_params, {
+          getHazoConnect: resolved.getHazoConnect,
+          adminScope:     resolved.adminScope,
+          logger:         resolved.logger,
+        });
       }
 
       // GET /admin/:id
