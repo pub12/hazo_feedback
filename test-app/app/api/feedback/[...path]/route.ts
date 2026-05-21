@@ -40,6 +40,11 @@ function getFeedbackServer(): ReturnType<typeof createFeedbackServer> {
     getFileManager,
     appId: 'test-app',
     adminScope: 'hazo_feedback:test-app:admin',
+    notifyOptions: {
+      getHazoConnect,
+      from: 'feedback@example.com',
+      fromName: 'hazo_feedback Test',
+    },
     logger: consoleLogger,
   });
 

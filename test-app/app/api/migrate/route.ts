@@ -83,6 +83,95 @@ CREATE TABLE IF NOT EXISTS hazo_feedback_events (
 CREATE INDEX IF NOT EXISTS idx_hf_events_submission
   ON hazo_feedback_events (submission_id);
 
+-- ─── hazo_notify v5 schema (inbox, channel_deliveries, templates) ────────────
+-- Consolidated from migrations 001+002+005+006+007 (SQLite fresh-install).
+-- Migration 004 is a Postgres-only RPC wrapper — skipped for SQLite.
+
+CREATE TABLE IF NOT EXISTS hazo_notify_template_cat (
+  id            TEXT PRIMARY KEY,
+  scope_id      TEXT NULL,
+  template_category_name TEXT NOT NULL,
+  created_at    TEXT DEFAULT (datetime('now')),
+  changed_at    TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_notify_template_cat_scope
+  ON hazo_notify_template_cat (scope_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_notify_template_cat_scoped
+  ON hazo_notify_template_cat (template_category_name, scope_id)
+  WHERE scope_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_notify_template_cat_global
+  ON hazo_notify_template_cat (template_category_name)
+  WHERE scope_id IS NULL;
+
+CREATE TABLE IF NOT EXISTS hazo_notify_templates (
+  id                    TEXT PRIMARY KEY,
+  scope_id              TEXT NULL,
+  template_category_id  TEXT NOT NULL REFERENCES hazo_notify_template_cat(id),
+  template_variables    TEXT DEFAULT '{}',
+  template_name         TEXT NOT NULL,
+  template_label        TEXT,
+  category              TEXT,
+  bodies                TEXT NOT NULL DEFAULT '{}',
+  is_modified           INTEGER NOT NULL DEFAULT 0,
+  created_at            TEXT DEFAULT (datetime('now')),
+  changed_at            TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_notify_templates_scope
+  ON hazo_notify_templates (scope_id);
+CREATE INDEX IF NOT EXISTS idx_notify_templates_lookup
+  ON hazo_notify_templates (template_name, scope_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_notify_templates_scoped
+  ON hazo_notify_templates (template_name, scope_id)
+  WHERE scope_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_notify_templates_global
+  ON hazo_notify_templates (template_name)
+  WHERE scope_id IS NULL;
+
+CREATE TABLE IF NOT EXISTS hazo_notify_inbox (
+  id               TEXT PRIMARY KEY,
+  scope_id         TEXT NOT NULL,
+  user_id          TEXT NOT NULL,
+  event_type       TEXT NOT NULL,
+  subject_id       TEXT,
+  batch_key        TEXT NOT NULL,
+  in_app_text      TEXT NOT NULL,
+  deep_link        TEXT NOT NULL,
+  payload          TEXT NOT NULL DEFAULT '{}',
+  surfaces         TEXT NOT NULL,
+  aggregate_count  INTEGER NOT NULL DEFAULT 1,
+  batch_closed_at  TEXT,
+  read_at          TEXT,
+  created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at       TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_inbox_open_batch
+  ON hazo_notify_inbox (batch_key) WHERE batch_closed_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_inbox_user_unread
+  ON hazo_notify_inbox (user_id, created_at DESC) WHERE read_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS hazo_notify_channel_deliveries (
+  id             TEXT PRIMARY KEY,
+  inbox_id       TEXT NOT NULL REFERENCES hazo_notify_inbox(id) ON DELETE CASCADE,
+  channel_id     TEXT NOT NULL,
+  payload        TEXT NOT NULL,
+  status         TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','sent','failed')),
+  flush_after    TEXT NOT NULL,
+  attempt_count  INTEGER NOT NULL DEFAULT 0,
+  message_id     TEXT,
+  last_error     TEXT,
+  finalized_at   TEXT,
+  created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at     TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_delivery_inbox_channel
+  ON hazo_notify_channel_deliveries (inbox_id, channel_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_due
+  ON hazo_notify_channel_deliveries (channel_id, flush_after) WHERE status = 'pending';
+
 -- ─── hazo_auth canonical schema (subset needed for admin permission lookups) ──
 -- See: hazo_auth/src/lib/schema/sqlite_schema.ts. Only the tables that
 -- hazo_get_auth's fetch_user_data_from_db reads from are included here.
