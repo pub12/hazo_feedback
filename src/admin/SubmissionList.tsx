@@ -154,6 +154,17 @@ export function SubmissionList({
                     variant={{ dot: 'bg-rose-500', text: 'text-rose-700' }}
                   />
                 )}
+                {sub.category === 'feature' && (sub as { vote_count?: number; is_public?: boolean }).is_public && (
+                  <Chip
+                    label="public"
+                    variant={{ dot: 'bg-green-500', text: 'text-green-700' }}
+                  />
+                )}
+                {sub.category === 'feature' && typeof (sub as { vote_count?: number }).vote_count === 'number' && (
+                  <span className="inline-flex items-center gap-0.5 text-[11px] text-gray-500">
+                    ▲ {(sub as { vote_count?: number }).vote_count}
+                  </span>
+                )}
               </div>
             </button>
           </li>

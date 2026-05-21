@@ -2,6 +2,7 @@ import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { hazo_get_auth } from 'hazo_auth/server-lib';
 import { create_submission_service } from '../../db/submission_service.js';
+import { create_vote_service } from '../../db/vote_service.js';
 import type { FeedbackStatus, FeedbackCategory, Logger } from '../../types.js';
 
 interface AdminHandlerOptions {
@@ -59,7 +60,12 @@ export async function handle_admin_list(
       offset,
     });
 
-    return NextResponse.json({ submissions });
+    const vote_service = create_vote_service(adapter);
+    const ids = submissions.map((s) => s.id);
+    const counts = await vote_service.count_votes_for(ids);
+    const augmented = submissions.map((s) => ({ ...s, vote_count: counts.get(s.id) ?? 0 }));
+
+    return NextResponse.json({ submissions: augmented });
   } catch (err) {
     logger?.error('handle_admin_list: unexpected error', {
       error: String(err),
