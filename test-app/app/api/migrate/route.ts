@@ -83,6 +83,71 @@ CREATE TABLE IF NOT EXISTS hazo_feedback_events (
 CREATE INDEX IF NOT EXISTS idx_hf_events_submission
   ON hazo_feedback_events (submission_id);
 
+-- ─── hazo_feedback v2.1.0 additions (voting and reply threads) ─────────────
+
+ALTER TABLE hazo_feedback_events ADD COLUMN IF NOT EXISTS body_html TEXT NULL;
+ALTER TABLE hazo_feedback_events ADD COLUMN IF NOT EXISTS body_text TEXT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_hf_events_submission_type
+  ON hazo_feedback_events (submission_id, event_type);
+
+-- SQLite: recreate attachments table to allow event_id and make submission_id nullable
+CREATE TABLE IF NOT EXISTS hazo_feedback_attachments_temp (
+  id             TEXT PRIMARY KEY,
+  submission_id  TEXT NULL,
+  event_id       TEXT NULL,
+  inline_id      TEXT NULL,
+  file_id        TEXT NOT NULL,
+  mime_type      TEXT NOT NULL,
+  size_bytes     INTEGER NOT NULL,
+  kind           TEXT NOT NULL,
+  created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  CHECK (
+    (submission_id IS NOT NULL AND event_id IS NULL)
+    OR (submission_id IS NULL AND event_id IS NOT NULL)
+  )
+);
+
+INSERT INTO hazo_feedback_attachments_temp
+  (id, submission_id, event_id, inline_id, file_id, mime_type, size_bytes, kind, created_at)
+SELECT id, submission_id, NULL, inline_id, file_id, mime_type, size_bytes, kind, created_at
+FROM hazo_feedback_attachments
+WHERE 1=0 OR (SELECT COUNT(*) FROM hazo_feedback_attachments) = 0;
+
+-- If table has existing data, do the actual migration
+INSERT OR IGNORE INTO hazo_feedback_attachments_temp
+  (id, submission_id, event_id, inline_id, file_id, mime_type, size_bytes, kind, created_at)
+SELECT id, submission_id, NULL, inline_id, file_id, mime_type, size_bytes, kind, created_at
+FROM hazo_feedback_attachments;
+
+DROP TABLE IF EXISTS hazo_feedback_attachments;
+ALTER TABLE hazo_feedback_attachments_temp RENAME TO hazo_feedback_attachments;
+
+CREATE INDEX IF NOT EXISTS idx_hf_attachments_submission
+  ON hazo_feedback_attachments (submission_id);
+
+CREATE INDEX IF NOT EXISTS idx_hf_attachments_event
+  ON hazo_feedback_attachments (event_id);
+
+ALTER TABLE hazo_feedback_submissions ADD COLUMN IF NOT EXISTS is_public INTEGER NOT NULL DEFAULT 0;
+
+CREATE INDEX IF NOT EXISTS idx_hf_submissions_public_feature
+  ON hazo_feedback_submissions (is_public, category);
+
+CREATE TABLE IF NOT EXISTS hazo_feedback_votes (
+  id             TEXT PRIMARY KEY,
+  submission_id  TEXT NOT NULL,
+  user_id        TEXT NOT NULL,
+  created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (submission_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_hf_votes_submission
+  ON hazo_feedback_votes (submission_id);
+
+CREATE INDEX IF NOT EXISTS idx_hf_votes_user
+  ON hazo_feedback_votes (user_id);
+
 -- ─── hazo_notify v5 schema (inbox, channel_deliveries, templates) ────────────
 -- Consolidated from migrations 001+002+005+006+007 (SQLite fresh-install).
 -- Migration 004 is a Postgres-only RPC wrapper — skipped for SQLite.
