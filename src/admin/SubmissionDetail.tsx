@@ -15,6 +15,7 @@ import { ContextTab } from './tabs/ContextTab.js';
 import { AttachmentsTab } from './tabs/AttachmentsTab.js';
 import { ActivityTab } from './tabs/ActivityTab.js';
 import { ConversationTab } from './tabs/ConversationTab.js';
+import { VotersTab } from './tabs/VotersTab.js';
 import { PromptAccordion } from './PromptAccordion.js';
 
 const cn = (...inputs: Parameters<typeof clsx>) => twMerge(clsx(...inputs));
@@ -39,7 +40,7 @@ interface SubmissionDetailProps {
   onUpdate?: () => void;
 }
 
-type TabKey = 'overview' | 'conversation' | 'activity' | 'context' | 'attachments';
+type TabKey = 'overview' | 'conversation' | 'activity' | 'context' | 'attachments' | 'voters';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
@@ -47,6 +48,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'context', label: 'Context' },
   { key: 'attachments', label: 'Attachments' },
   { key: 'activity', label: 'Activity' },
+  { key: 'voters', label: 'Voters' },
 ];
 
 const VALID_STATUSES: FeedbackStatus[] = [
@@ -272,6 +274,22 @@ export function SubmissionDetail({
               </select>
             </div>
 
+            {submission.category === 'feature' && !submission.marked_spam && (
+              <button
+                onClick={async () => {
+                  const res = await fetch(`${apiBase}/admin/${submission.id}`, {
+                    method: 'PATCH',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_public: !submission.is_public }),
+                  });
+                  if (res.ok) refresh();
+                }}
+                className={`px-3 py-1 text-sm rounded ${submission.is_public ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}
+              >
+                {submission.is_public ? 'Public' : 'Make public'}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -349,6 +367,7 @@ export function SubmissionDetail({
           />
         )}
         {activeTab === 'activity' && <ActivityTab events={events} />}
+        {activeTab === 'voters' && <VotersTab submissionId={submissionId} apiBase={apiBase} />}
       </div>
 
       {/* Prompt accordion — collapsible drawer at the bottom */}
