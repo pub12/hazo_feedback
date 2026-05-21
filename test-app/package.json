@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "hazo_feedback": "^1.0.0",
+    "hazo_feedback": "^2.1.0",
     "hazo_connect": "^2.6.0",
     "hazo_auth": "^5.3.1",
     "hazo_ui": "^2.9.0",
