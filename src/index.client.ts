@@ -28,3 +28,6 @@ export type {
   FeedbackStatus,
   FeedbackPriority,
 } from './types.js';
+
+export { FeedbackThread } from './widget/FeedbackThread.js';
+export type { FeedbackThreadProps } from './widget/FeedbackThread.js';
