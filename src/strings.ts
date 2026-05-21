@@ -37,4 +37,31 @@ export const FEEDBACK_STRINGS: Record<string, string> = {
   'feedback.admin.copyPrompt': 'Copy AI prompt',
   'feedback.admin.promptCopied': 'Copied to clipboard',
   'feedback.admin.export': 'Export',
+
+  // R5 — thread
+  'thread.loading':              'Loading…',
+  'thread.empty':                'No replies yet.',
+  'thread.no_subject':           '(no subject)',
+  'thread.author.admin':         'Admin',
+  'thread.author.you':           'You',
+  'thread.cannot_reply':         'Replies open after an admin responds.',
+  'thread.compose.placeholder':  'Reply…',
+  'thread.compose.send':         'Send reply',
+  'thread.compose.sending':      'Sending…',
+  'thread.error.unauthorized':   'Please sign in to view this thread.',
+  'thread.error.forbidden':      'You do not have access to this thread.',
+  'thread.error.not_found':      'Thread not found.',
+
+  // R2 — public board
+  'board.title':                 'Feature requests',
+  'board.loading':               'Loading…',
+  'board.empty':                 'No public feature requests yet.',
+  'board.no_subject':            '(no subject)',
+  'board.vote.toggle':           'Toggle vote',
+  'board.sort.top':              'Top',
+  'board.sort.new':              'New',
+  'board.prev':                  'Previous',
+  'board.next':                  'Next',
+  'board.page':                  'Page {page} of {total}',
+  'board.error.unauthorized':    'Please sign in to view feature requests.',
 };
