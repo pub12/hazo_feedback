@@ -10,6 +10,7 @@ import { handle_admin_comment } from './handlers/admin_comment.js';
 import { handle_admin_reply } from './handlers/admin_reply.js';
 import { handle_user_reply } from './handlers/user_reply.js';
 import { handle_thread } from './handlers/thread.js';
+import { handle_thread_attachment } from './handlers/thread_attachment.js';
 import { handle_admin_export_prompt } from './handlers/admin_export_prompt.js';
 import { handle_admin_attachment } from './handlers/admin_attachment.js';
 import { handle_vote } from './handlers/vote.js';
@@ -169,6 +170,18 @@ export function createFeedbackServer(options: FeedbackServerOptions): FeedbackSe
 
     // ── GET routes ────────────────────────────────────────────────────────────
     if (method === 'GET') {
+      // GET /thread/:refId/attachment/:attachmentId — must be before GET /thread/:refId
+      const thread_att_params = match_route(segments, ['thread', ':refId', 'attachment', ':attachmentId']);
+      if (thread_att_params !== null) {
+        return handle_thread_attachment(request, thread_att_params, {
+          getHazoConnect: resolved.getHazoConnect,
+          getFileManager: resolved.getFileManager,
+          appId:          resolved.appId,
+          adminScope:     resolved.adminScope,
+          logger:         resolved.logger,
+        });
+      }
+
       // GET /thread/:refId
       const thread_params = match_route(segments, ['thread', ':refId']);
       if (thread_params !== null) {

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RawHtml } from './RawHtml.js';
 import { ReplyComposer } from './ReplyComposer.js';
 import type { AttachmentFile } from './AttachmentTray.js';
+import { FEEDBACK_STRINGS } from '../strings.js';
 
 interface ThreadReply {
   id: string;
@@ -35,18 +36,25 @@ export interface FeedbackThreadProps {
   translate?: (key: string, vars?: Record<string, string>) => string;
 }
 
-const DEFAULT_T = (k: string) => k;
+function DEFAULT_T(k: string, vars?: Record<string, string>): string {
+  let s = FEEDBACK_STRINGS[k] ?? k;
+  if (vars) {
+    for (const [key, val] of Object.entries(vars)) s = s.replace(`{${key}}`, val);
+  }
+  return s;
+}
 
-// Rewrite bare attachment-UUID img src to the admin attachment endpoint.
-// Admin replies served via the admin endpoint; user replies served the same
-// way since the thread endpoint already gates on submitter identity.
-function rewrite_img_src(html: string, apiBase: string): string {
+// Rewrite bare attachment-UUID img src to the thread attachment endpoint.
+// `attachmentBase` = `${apiBase}/thread/${refId}` so the final URL is
+// `${apiBase}/thread/:refId/attachment/:attachmentId`, which is accessible
+// to both the submitter and admins.
+function rewrite_img_src(html: string, attachmentBase: string): string {
   if (typeof window === 'undefined') return html;
   const doc = new DOMParser().parseFromString(html, 'text/html');
   doc.querySelectorAll('img[data-feedback-inline-id]').forEach((img) => {
     const src = img.getAttribute('src');
     if (src && !/^https?:|^\//i.test(src)) {
-      img.setAttribute('src', `${apiBase}/admin/attachment/${src}`);
+      img.setAttribute('src', `${attachmentBase}/attachment/${src}`);
     }
   });
   return doc.body.innerHTML;
@@ -54,17 +62,17 @@ function rewrite_img_src(html: string, apiBase: string): string {
 
 function Bubble({
   reply,
-  apiBase,
+  attachmentBase,
   t,
 }: {
   reply: ThreadReply;
-  apiBase: string;
+  attachmentBase: string;
   t: (k: string, v?: Record<string, string>) => string;
 }) {
   const isAdmin = reply.event_type === 'admin_reply';
   const html = useMemo(
-    () => reply.body_html ? rewrite_img_src(reply.body_html, apiBase) : null,
-    [reply.body_html, apiBase],
+    () => reply.body_html ? rewrite_img_src(reply.body_html, attachmentBase) : null,
+    [reply.body_html, attachmentBase],
   );
 
   return (
@@ -162,7 +170,9 @@ export function FeedbackThread({ refId, apiBase = '/api/feedback', translate }: 
         {data.replies.length === 0 ? (
           <p className="text-sm italic text-gray-400">{t('thread.empty')}</p>
         ) : (
-          data.replies.map((r) => <Bubble key={r.id} reply={r} apiBase={apiBase} t={t} />)
+          data.replies.map((r) => (
+            <Bubble key={r.id} reply={r} attachmentBase={`${apiBase}/thread/${refId}`} t={t} />
+          ))
         )}
       </section>
 
