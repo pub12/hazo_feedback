@@ -19,6 +19,7 @@ export function CategorySelector({ value, onChange, translate }: CategorySelecto
       {CATEGORIES.map((cat) => (
         <button
           key={cat}
+          type="button"
           role="tab"
           aria-selected={value === cat}
           onClick={() => onChange(cat)}
