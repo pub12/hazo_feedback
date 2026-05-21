@@ -38,3 +38,9 @@ acknowledge_email_from = feedback@kinstripe.app
 acknowledge_email_from_name = Kinstripe
 ; Subject uses Handlebars syntax. Available variable: {{ref_id}}
 acknowledge_email_subject = We received your feedback ({{ref_id}})
+
+; --- Reply notifications (v2.1.0) ---
+; Send email to user when admin replies on their submission
+reply_email_to_user_enabled = true
+; Send email to admins when user replies back
+reply_email_to_admin_enabled = true

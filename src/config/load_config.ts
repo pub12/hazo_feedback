@@ -50,6 +50,13 @@ export function get_feedback_config(): FeedbackConfig {
   const acknowledge_email_subject =
     cfg.get('notify', 'acknowledge_email_subject') ?? 'We received your feedback';
 
+  const reply_email_to_user_enabled_raw = cfg.get('notify', 'reply_email_to_user_enabled') ?? 'true';
+  const reply_email_to_user_enabled =
+    reply_email_to_user_enabled_raw === 'true' || reply_email_to_user_enabled_raw === '1';
+  const reply_email_to_admin_enabled_raw = cfg.get('notify', 'reply_email_to_admin_enabled') ?? 'true';
+  const reply_email_to_admin_enabled =
+    reply_email_to_admin_enabled_raw === 'true' || reply_email_to_admin_enabled_raw === '1';
+
   cached_config = {
     appId: app_id,
     ...(app_version !== undefined ? { appVersion: app_version } : {}),
@@ -72,6 +79,8 @@ export function get_feedback_config(): FeedbackConfig {
       acknowledgeEmailFrom: acknowledge_email_from,
       acknowledgeEmailFromName: acknowledge_email_from_name,
       acknowledgeEmailSubject: acknowledge_email_subject,
+      replyEmailToUserEnabled: reply_email_to_user_enabled,
+      replyEmailToAdminEnabled: reply_email_to_admin_enabled,
     },
   };
 
