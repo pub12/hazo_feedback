@@ -1,6 +1,6 @@
 {
   "name": "hazo_feedback",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "type": "module",
   "description": "Drop-in contextual feedback widget for hazo apps",
   "main": "./dist/index.js",
