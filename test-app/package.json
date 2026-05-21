@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "hazo_feedback": "^1.0.0",
-    "hazo_connect": "^2.4.0",
+    "hazo_connect": "^2.6.0",
     "hazo_auth": "^5.3.1",
     "hazo_ui": "^2.9.0",
-    "hazo_notify": "^3.1.0",
+    "hazo_notify": "^5.0.0",
     "hazo_files": "^1.0.0",
     "@tiptap/react": "^3.20.5",
     "@tiptap/starter-kit": "^3.20.5",
