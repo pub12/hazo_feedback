@@ -34,3 +34,6 @@ export type { FeedbackThreadProps } from './widget/FeedbackThread.js';
 
 export { PublicFeatureBoard } from './widget/PublicFeatureBoard.js';
 export type { PublicFeatureBoardProps } from './widget/PublicFeatureBoard.js';
+
+export { ReplyComposer } from './widget/ReplyComposer.js';
+export type { ReplyComposerProps } from './widget/ReplyComposer.js';

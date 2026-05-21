@@ -1,21 +1,18 @@
-export type ReplyPayloadResult =
-  | { ok: true; body_html: string; body_text: string }
+const MAX_BODY_HTML = 100_000;
+
+export type ReplyBodyResult =
+  | { ok: true; body_html: string }
   | { ok: false; error: string };
 
-const MAX_BODY_TEXT = 5000;
+function has_content(html: string): boolean {
+  return html.replace(/<[^>]*>/g, '').trim().length > 0 || /<img/i.test(html);
+}
 
-export function validate_reply_payload(input: unknown): ReplyPayloadResult {
-  if (!input || typeof input !== 'object') {
-    return { ok: false, error: 'body must be a JSON object' };
-  }
-  const obj = input as Record<string, unknown>;
-  const body_html = obj.body_html;
-  const body_text = obj.body_text;
+export function validate_reply_body_html(body_html: string): ReplyBodyResult {
   if (typeof body_html !== 'string') return { ok: false, error: 'body_html must be a string' };
-  if (typeof body_text !== 'string') return { ok: false, error: 'body_text must be a string' };
-  if (body_text.trim().length === 0) return { ok: false, error: 'body_text must not be empty' };
-  if (body_text.length > MAX_BODY_TEXT) {
-    return { ok: false, error: `body_text exceeds 5000 chars (got ${body_text.length})` };
+  if (!has_content(body_html)) return { ok: false, error: 'body_html must not be empty' };
+  if (body_html.length > MAX_BODY_HTML) {
+    return { ok: false, error: `body_html exceeds max length (${body_html.length} chars, max ${MAX_BODY_HTML})` };
   }
-  return { ok: true, body_html, body_text };
+  return { ok: true, body_html };
 }

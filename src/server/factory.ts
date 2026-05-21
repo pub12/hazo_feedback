@@ -139,6 +139,7 @@ export function createFeedbackServer(options: FeedbackServerOptions): FeedbackSe
       if (admin_reply_params !== null) {
         return handle_admin_reply(request, admin_reply_params, {
           getHazoConnect:   resolved.getHazoConnect,
+          getFileManager:   resolved.getFileManager,
           appId:            resolved.appId,
           adminScope:       resolved.adminScope,
           threadUrlBuilder: resolved.threadUrlBuilder,
@@ -153,6 +154,7 @@ export function createFeedbackServer(options: FeedbackServerOptions): FeedbackSe
       if (user_reply_params !== null) {
         return handle_user_reply(request, user_reply_params, {
           getHazoConnect:         resolved.getHazoConnect,
+          getFileManager:         resolved.getFileManager,
           appId:                  resolved.appId,
           adminScope:             resolved.adminScope,
           threadUrlBuilder:       resolved.threadUrlBuilder,
