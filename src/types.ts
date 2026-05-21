@@ -12,7 +12,10 @@ export type FeedbackEventType =
   | 'status_changed'
   | 'priority_changed'
   | 'comment_added'
-  | 'exported_prompt';
+  | 'exported_prompt'
+  | 'admin_reply'
+  | 'user_reply'
+  | 'visibility_changed';
 
 export interface FeedbackSubmission {
   id: string;
@@ -34,6 +37,7 @@ export interface FeedbackSubmission {
   status: FeedbackStatus;
   priority: FeedbackPriority | null;
   marked_spam: boolean;
+  is_public: boolean;
   url: string;
   route: string | null;
   viewport_w: number | null;
@@ -53,7 +57,8 @@ export interface FeedbackSubmission {
 
 export interface FeedbackAttachment {
   id: string;
-  submission_id: string;
+  submission_id: string | null;
+  event_id: string | null;
   inline_id: string | null;
   file_id: string;
   mime_type: string;
@@ -70,6 +75,15 @@ export interface FeedbackEvent {
   from_value: string | null;
   to_value: string | null;
   comment: string | null;
+  body_html: string | null;
+  body_text: string | null;
+  created_at: string;
+}
+
+export interface FeedbackVote {
+  id: string;
+  submission_id: string;
+  user_id: string;
   created_at: string;
 }
 
@@ -118,6 +132,8 @@ export interface FeedbackServerOptions {
     from: string;
     fromName?: string;
   };
+  threadUrlBuilder?: (refId: string, submissionId: string) => string;
+  listAdminsForBroadcast?: () => Promise<string[]>;
   logger?: Logger;
 }
 
@@ -159,6 +175,8 @@ export interface NotifyConfig {
   acknowledgeEmailFrom: string;
   acknowledgeEmailFromName: string;
   acknowledgeEmailSubject: string;
+  replyEmailToUserEnabled: boolean;
+  replyEmailToAdminEnabled: boolean;
 }
 
 export interface Logger {
