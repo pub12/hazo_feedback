@@ -322,6 +322,26 @@ console.log(FEEDBACK_STRINGS['button.open_feedback']); // "Send feedback"
 - Timestamped, attributed to actor
 - No external notification (comment is visible on next admin visit)
 
+## Reply threads
+
+After a feedback submission, the admin can reply via the Conversation tab in the admin dashboard. The submitter is notified via hazo_notify's in-app inbox (always) and email (configurable). The submitter can reply back from the standalone thread page: `<FeedbackThread refId="…" apiBase="/api/feedback" />`.
+
+Constraints:
+- Authed users only (anon submitters don't get reply threads in v2.1).
+- User can reply only after the first admin reply (server returns `409 Conflict` otherwise).
+- Replies are immutable and rate-limited per user.
+- See `SETUP_CHECKLIST.md` for mounting `<FeedbackThread />`.
+
+## Public voting / feature board
+
+Mount `<PublicFeatureBoard apiBase="/api/feedback" />` on a logged-in route. Admins toggle individual feature submissions to public via the "Make public" button on the submission detail page. Users vote with a single click (toggle); top-voted features bubble to the top.
+
+Constraints:
+- `category='feature'` only (server rejects other categories with `422`).
+- Authed users only — anon users see a sign-in prompt.
+- Self-voting allowed.
+- Vote counts are computed on read (no denormalization in v2.1).
+
 ## TypeScript Types
 
 ```typescript
@@ -421,6 +441,8 @@ interface FeedbackServer {
 export { FeedbackProvider } from 'hazo_feedback/client';
 export { FeedbackWidget } from 'hazo_feedback/client';
 export { FeedbackAdminPage } from 'hazo_feedback/client';
+export { FeedbackThread } from 'hazo_feedback/client';
+export { PublicFeatureBoard } from 'hazo_feedback/client';
 
 // Hooks
 export { useRegisterFeedbackContext } from 'hazo_feedback/client';
@@ -433,6 +455,12 @@ export { feedback } from 'hazo_feedback/client';
 // i18n defaults
 export { FEEDBACK_STRINGS } from 'hazo_feedback/client';
 ```
+
+#### Component Props
+
+**`<FeedbackThread refId apiBase translate />`** — Standalone reply thread for the submitter.
+
+**`<PublicFeatureBoard apiBase translate pageSize defaultSort onSubmissionClick />`** — Logged-in feature roadmap with voting.
 
 ## Deferral Ledger (v1.0)
 
