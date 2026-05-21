@@ -7,6 +7,9 @@ import { handle_admin_list } from './handlers/admin_list.js';
 import { handle_admin_detail } from './handlers/admin_detail.js';
 import { handle_admin_update } from './handlers/admin_update.js';
 import { handle_admin_comment } from './handlers/admin_comment.js';
+import { handle_admin_reply } from './handlers/admin_reply.js';
+import { handle_user_reply } from './handlers/user_reply.js';
+import { handle_thread } from './handlers/thread.js';
 import { handle_admin_export_prompt } from './handlers/admin_export_prompt.js';
 import { handle_admin_attachment } from './handlers/admin_attachment.js';
 import { extract_feedback_path, match_route } from './router.js';
@@ -23,6 +26,8 @@ function resolve_options(options: FeedbackServerOptions): {
   getHazoConnect: () => Promise<unknown> | unknown;
   getFileManager: () => Promise<unknown> | unknown;
   notifyOptions: FeedbackServerOptions['notifyOptions'];
+  threadUrlBuilder: FeedbackServerOptions['threadUrlBuilder'];
+  listAdminsForBroadcast: FeedbackServerOptions['listAdminsForBroadcast'];
   logger: FeedbackServerOptions['logger'];
 } {
   const config = get_feedback_config();
@@ -32,6 +37,8 @@ function resolve_options(options: FeedbackServerOptions): {
     getHazoConnect: options.getHazoConnect,
     getFileManager: options.getFileManager,
     notifyOptions:  options.notifyOptions,
+    threadUrlBuilder:       options.threadUrlBuilder,
+    listAdminsForBroadcast: options.listAdminsForBroadcast,
     logger:         options.logger,
   };
 }
@@ -63,12 +70,13 @@ type RouteEntry =
 function wrap_submit(opts: ResolvedOpts) {
   return (request: NextRequest, _params: Record<string, string>): Promise<NextResponse> =>
     handle_submit(request, {
-      getHazoConnect: opts.getHazoConnect,
-      getFileManager: opts.getFileManager,
-      appId:          opts.appId,
-      adminScope:     opts.adminScope,
-      notifyOptions:  opts.notifyOptions,
-      logger:         opts.logger,
+      getHazoConnect:   opts.getHazoConnect,
+      getFileManager:   opts.getFileManager,
+      appId:            opts.appId,
+      adminScope:       opts.adminScope,
+      notifyOptions:    opts.notifyOptions,
+      threadUrlBuilder: opts.threadUrlBuilder,
+      logger:           opts.logger,
     });
 }
 
@@ -113,10 +121,50 @@ export function createFeedbackServer(options: FeedbackServerOptions): FeedbackSe
       if (comment_params !== null) {
         return handle_admin_comment(request, comment_params, make_admin_base_opts(resolved));
       }
+
+      const admin_reply_params = match_route(segments, ['admin', ':id', 'reply']);
+      if (admin_reply_params !== null) {
+        return handle_admin_reply(request, admin_reply_params, {
+          getHazoConnect:   resolved.getHazoConnect,
+          appId:            resolved.appId,
+          adminScope:       resolved.adminScope,
+          threadUrlBuilder: resolved.threadUrlBuilder,
+          notifyOptions:    resolved.notifyOptions
+            ? { from: resolved.notifyOptions.from, fromName: resolved.notifyOptions.fromName }
+            : undefined,
+          logger:           resolved.logger,
+        });
+      }
+
+      const user_reply_params = match_route(segments, ['thread', ':refId', 'reply']);
+      if (user_reply_params !== null) {
+        return handle_user_reply(request, user_reply_params, {
+          getHazoConnect:         resolved.getHazoConnect,
+          appId:                  resolved.appId,
+          adminScope:             resolved.adminScope,
+          threadUrlBuilder:       resolved.threadUrlBuilder,
+          notifyOptions:          resolved.notifyOptions
+            ? { from: resolved.notifyOptions.from, fromName: resolved.notifyOptions.fromName }
+            : undefined,
+          listAdminsForBroadcast: resolved.listAdminsForBroadcast,
+          logger:                 resolved.logger,
+        });
+      }
     }
 
     // ── GET routes ────────────────────────────────────────────────────────────
     if (method === 'GET') {
+      // GET /thread/:refId
+      const thread_params = match_route(segments, ['thread', ':refId']);
+      if (thread_params !== null) {
+        return handle_thread(request, thread_params, {
+          getHazoConnect: resolved.getHazoConnect,
+          appId:          resolved.appId,
+          adminScope:     resolved.adminScope,
+          logger:         resolved.logger,
+        });
+      }
+
       // GET /admin/attachment/:attachmentId — must be checked before GET /admin/:id
       const attachment_params = match_route(segments, ['admin', 'attachment', ':attachmentId']);
       if (attachment_params !== null) {

@@ -26,6 +26,7 @@ export interface SubmitHandlerOptions {
     from: string;
     fromName?: string;
   };
+  threadUrlBuilder?: (refId: string, submissionId: string) => string;
   logger?: Logger;
 }
 
@@ -89,7 +90,7 @@ export async function handle_submit(
   request: NextRequest,
   opts: SubmitHandlerOptions
 ): Promise<NextResponse> {
-  const { getHazoConnect, getFileManager, appId, notifyOptions, logger } = opts;
+  const { getHazoConnect, getFileManager, appId, notifyOptions, threadUrlBuilder, logger } = opts;
 
   const config = get_feedback_config();
   const effective_app_id = appId || config.appId;
@@ -401,7 +402,7 @@ export async function handle_submit(
         submittedAt: new Date(),
         recipientUserId: user_id ?? "",
         scopeId: "",
-        deepLink: `/feedback/thread/${ref_id}`,
+        deepLink: (threadUrlBuilder ?? ((r) => `/feedback/thread/${r}`))(ref_id, submission_id),
       }).catch((err: unknown) => {
         logger?.warn('handle_submit: acknowledgement email failed', { error: String(err) });
       });
