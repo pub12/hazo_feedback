@@ -5,6 +5,8 @@ module.exports = {
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^server-only$': '<rootDir>/src/__tests__/__mocks__/server-only.cjs',
+    '^hazo_connect/server$': '<rootDir>/src/__tests__/__mocks__/hazo_connect_server.ts',
   },
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
