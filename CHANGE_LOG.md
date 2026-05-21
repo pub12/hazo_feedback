@@ -4,6 +4,32 @@ All notable changes to `hazo_feedback` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-05-21
+
+### Added
+- **Reply threads (R5).** Two-way conversations between admins and submitters. New `<FeedbackThread />` user-facing component, new Conversation tab in admin, three new event types (`admin_reply`, `user_reply`, `visibility_changed`). Notifications via `hazo_notify` v5 `dispatch()` — in-app inbox always on, email per-direction config-gated.
+- **Public voting (R2).** New `<PublicFeatureBoard />` component, `is_public` toggle on feature submissions, `hazo_feedback_votes` table, per-user toggle endpoint, admin Voters tab.
+- New server options: `threadUrlBuilder(refId, submissionId)`, `listAdminsForBroadcast()`.
+- New config keys (default `true`): `[notify] reply_email_to_user_enabled`, `[notify] reply_email_to_admin_enabled`.
+- Email templates: `feedback_admin_reply_to_user`, `feedback_user_reply_to_admin`.
+
+### Changed
+- **Peer dep `hazo_notify` bumped to `^5.0.0`.** v3 `send_template_email` removed in favor of `dispatch()` channel-pluggable architecture. Consumers must run hazo_notify v5 migrations (`005`/`006`/`007`) and have a worker process flushing the inbox.
+- `send_acknowledgement` is now asynchronous (queued via `dispatch()`); the consumer's hazo_notify worker flushes it.
+- `hazo_feedback_attachments.submission_id` is now nullable; new `event_id` column lets attachments anchor to reply events. XOR `CHECK` constraint enforces exactly one owner.
+- `hazo_feedback_events` gains `body_html` and `body_text` columns; existing rows have `NULL` values (no backfill required).
+
+### Migration
+- Run `migrations/002_voting_and_replies.sql` against the consumer's database.
+- Re-call `sync_system_templates(hazo_feedback_template_manifest, ...)` at consumer boot so the two new templates land in `hazo_notify_templates`.
+- Provide `threadUrlBuilder` (recommended) and `listAdminsForBroadcast` to `createFeedbackServer({ ... })`.
+
+### Out of scope (deferred)
+- Anon-submitter reply paths.
+- `admin_comment` (internal-note) UI — the endpoint exists, no UI surface added.
+- Integrations (Linear/GitHub/Jira/Slack/Discord).
+- Search + bulk admin operations.
+
 ## [2.0.0] - 2026-05-14
 
 ### Breaking changes
