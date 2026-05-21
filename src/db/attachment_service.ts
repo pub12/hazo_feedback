@@ -6,7 +6,8 @@ const TABLE = 'hazo_feedback_attachments';
 
 interface AttachmentRow extends Record<string, unknown> {
   id: string;
-  submission_id: string;
+  submission_id: string | null;
+  event_id: string | null;
   inline_id: string | null;
   file_id: string;
   mime_type: string;
@@ -16,7 +17,17 @@ interface AttachmentRow extends Record<string, unknown> {
 }
 
 function row_to_attachment(row: AttachmentRow): FeedbackAttachment {
-  return { ...row, kind: row.kind as AttachmentKind };
+  return {
+    id: row.id,
+    submission_id: row.submission_id,
+    event_id: row.event_id,
+    inline_id: row.inline_id,
+    file_id: row.file_id,
+    mime_type: row.mime_type,
+    size_bytes: row.size_bytes,
+    kind: row.kind as AttachmentKind,
+    created_at: row.created_at,
+  };
 }
 
 export function create_attachment_service(adapter: unknown) {
@@ -29,10 +40,42 @@ export function create_attachment_service(adapter: unknown) {
     return rows.map(row_to_attachment);
   }
 
-  async function insert_attachment(data: Partial<AttachmentRow>): Promise<FeedbackAttachment> {
-    const rows = await svc.insert(data);
+  async function list_for_event(eventId: string): Promise<FeedbackAttachment[]> {
+    const rows = await svc.list((qb) => {
+      qb.where('event_id', 'eq', eventId);
+      qb.order('created_at', 'asc');
+      return qb;
+    });
+    return rows.map(row_to_attachment);
+  }
+
+  async function insert_submission_attachment(data: {
+    id: string;
+    submission_id: string;
+    inline_id: string | null;
+    file_id: string;
+    mime_type: string;
+    size_bytes: number;
+    kind: AttachmentKind;
+    created_at: string;
+  }): Promise<FeedbackAttachment> {
+    const rows = await svc.insert({ ...data, event_id: null });
     return row_to_attachment(rows[0]);
   }
 
-  return { list_for_submission, insert_attachment, raw: svc };
+  async function insert_event_attachment(data: {
+    id: string;
+    event_id: string;
+    inline_id: string | null;
+    file_id: string;
+    mime_type: string;
+    size_bytes: number;
+    kind: AttachmentKind;
+    created_at: string;
+  }): Promise<FeedbackAttachment> {
+    const rows = await svc.insert({ ...data, submission_id: null });
+    return row_to_attachment(rows[0]);
+  }
+
+  return { list_for_submission, list_for_event, insert_submission_attachment, insert_event_attachment, raw: svc };
 }

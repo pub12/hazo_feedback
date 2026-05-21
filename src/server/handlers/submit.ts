@@ -355,7 +355,7 @@ export async function handle_submit(
       const file_item = upload_result.data as FileItem;
       uploaded_paths.push(file_item.path);
 
-      await attachment_service.insert_attachment({
+      await attachment_service.insert_submission_attachment({
         id: attachment_id,
         submission_id,
         inline_id: entry.inline_id,
