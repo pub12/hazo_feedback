@@ -12,6 +12,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  ThumbsUp,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -20,6 +21,8 @@ const NAV_ITEMS = [
   { label: 'Anon Submit', href: '/anon-submit', icon: User },
   { label: 'Admin', href: '/admin', icon: Inbox },
   { label: 'Settings', href: '/settings', icon: Settings },
+  { label: 'Voting', href: '/voting', icon: ThumbsUp },
+  { label: 'Reply thread', href: '/reply-thread', icon: MessageSquare },
 ];
 
 export default function AppSidebar() {
