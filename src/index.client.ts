@@ -31,3 +31,6 @@ export type {
 
 export { FeedbackThread } from './widget/FeedbackThread.js';
 export type { FeedbackThreadProps } from './widget/FeedbackThread.js';
+
+export { PublicFeatureBoard } from './widget/PublicFeatureBoard.js';
+export type { PublicFeatureBoardProps } from './widget/PublicFeatureBoard.js';
