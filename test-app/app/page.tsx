@@ -1,7 +1,14 @@
 import Link from 'next/link';
-import { MessageSquare, UserCheck, User, Inbox, Settings } from 'lucide-react';
+import { MessageSquare, UserCheck, User, Inbox, Settings, MousePointerClick } from 'lucide-react';
 
 const TEST_PAGES = [
+  {
+    href: '/trigger',
+    label: 'Trigger',
+    icon: MousePointerClick,
+    description:
+      'Demonstrates the minimized prop on FeedbackWidget. Shows the icon-only pill (minimized=true, default) with hover-expand animation side-by-side with the always-expanded style (minimized=false).',
+  },
   {
     href: '/authed-submit',
     label: 'Authed Submit',

@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ThumbsUp,
+  MousePointerClick,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { label: 'Settings', href: '/settings', icon: Settings },
   { label: 'Voting', href: '/voting', icon: ThumbsUp },
   { label: 'Reply thread', href: '/reply-thread', icon: MessageSquare },
+  { label: 'Trigger', href: '/trigger', icon: MousePointerClick },
 ];
 
 export default function AppSidebar() {
