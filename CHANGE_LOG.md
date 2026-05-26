@@ -4,6 +4,13 @@ All notable changes to `hazo_feedback` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] — 2026-05-26
+
+### Changed
+- `FeedbackWidget` trigger button now defaults to icon-only (minimized) mode with a smooth hover-expand animation that reveals the label text. Consumers who prefer the always-expanded style should pass `minimized={false}`.
+
+---
+
 ## [2.1.1] - 2026-05-21
 
 ### Added
