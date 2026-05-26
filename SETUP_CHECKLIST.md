@@ -2,6 +2,18 @@
 
 Step-by-step guide to integrate hazo_feedback into your Next.js app.
 
+## Upgrading from v2.1.x to v2.1.2
+
+No schema migration required. One **default-behaviour change** to be aware of:
+
+- `<FeedbackWidget />` now renders as an **icon-only pill** by default (`minimized={true}`). On desktop, hovering the button expands it to show the label. This is a visual-only change — all existing functionality is preserved.
+- If you prefer the previous always-expanded style, pass `minimized={false}`:
+  ```tsx
+  <FeedbackWidget minimized={false} />
+  ```
+
+---
+
 ## Upgrading from v2.0.x to v2.1.0
 
 ### 1. Bump the peer dep
@@ -344,7 +356,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 }
 ```
 
-The widget will render a floating button in the bottom-right corner. It opens a dialog on desktop and a mobile drawer on smaller screens.
+The widget renders a floating button in the bottom-right corner. By default (`minimized={true}`) it shows as an icon-only pill; hover on desktop to expand the label. It opens a dialog on desktop and a mobile drawer on smaller screens. Pass `minimized={false}` for the always-expanded style.
 
 ## Template Manifest Registration
 
@@ -433,7 +445,7 @@ npm run dev
 
 Visit your app and:
 
-1. **Verify the widget appears:** Look for a floating feedback button in the bottom-right corner
+1. **Verify the widget appears:** Look for a small icon-only pill in the bottom-right corner. Hover it on desktop — the "Send feedback" label should slide in. (Pass `minimized={false}` if you want the label always visible.)
 2. **Test submit:** Click the button, fill out a feedback form, and submit
 3. **Check database:** Verify a record appears in `hazo_feedback_submissions`
 4. **Check email:** If configured, verify an acknowledgement email was sent with the ref_id

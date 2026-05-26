@@ -1,5 +1,9 @@
 # Minimized Trigger Button Implementation Plan
 
+## Implementation Progress
+
+- [ ] **Phase 1 — All Tasks:** Update FeedbackWidget, visual verify, CHANGE_LOG + version bump
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a `minimized` prop (default `true`) to `FeedbackWidget` so the trigger button renders as an icon-only pill by default, expanding on hover to reveal the label text via CSS animation.

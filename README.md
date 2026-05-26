@@ -4,7 +4,7 @@ Drop-in contextual feedback widget for hazo_* workspace apps. Collect bug report
 
 ## Features
 
-- **Floating feedback button** — always visible, opens dialog or mobile drawer
+- **Floating feedback button** — icon-only pill by default (minimized mode), expands on hover to reveal the label; opens dialog on desktop or drawer on mobile
 - **Auto-capture** — page URL, route, viewport, user agent, app version
 - **Screenshot** — lazy-loaded `html2canvas`, user-editable (annotate on roadmap)
 - **Context** — console errors (ring buffer), breadcrumbs (50-entry ring), consumer-registered state
@@ -145,7 +145,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
+      {/* Default: icon-only pill, expands to show label on hover */}
       <FeedbackWidget />
+      {/* Always-expanded style (pre-v2.1.2 behaviour): */}
+      {/* <FeedbackWidget minimized={false} /> */}
     </>
   );
 }
@@ -479,6 +482,10 @@ export { FEEDBACK_STRINGS } from 'hazo_feedback/client';
 ```
 
 #### Component Props
+
+**`<FeedbackWidget minimized? className? />`**
+- `minimized` (`boolean`, default `true`) — When `true`, renders an icon-only pill that expands on hover to reveal the label text via CSS animation. Set to `false` for the always-expanded style.
+- `className` (`string`, optional) — Additional Tailwind classes merged onto the trigger button.
 
 **`<FeedbackThread refId apiBase translate />`** — Standalone reply thread for the submitter.
 
